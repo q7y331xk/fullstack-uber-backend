@@ -4,8 +4,11 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import * as Joi from 'joi';
-import { RestaurantsModule } from './restaurants/restaurants.module';
-import { Restaurant } from './restaurants/entities/restaurant.entity';
+// import { RestaurantsModule } from './restaurants/restaurants.module';
+// import { Restaurant } from './restaurants/entities/restaurant.entity';
+import { UsersModule } from './users/users.module';
+import { User } from './users/entities/user.entity';
+import { JwtModule } from './jwt/jwt.module';
 
 @Module({
   imports: [
@@ -21,6 +24,7 @@ import { Restaurant } from './restaurants/entities/restaurant.entity';
         DB_USERNAME: Joi.string().required(),
         DB_PW: Joi.string().required(),
         DB_DB: Joi.string().required(),
+        TOKEN_KEY: Joi.string().required(),
       }),
     }),
     // typeorm postgres
@@ -33,14 +37,18 @@ import { Restaurant } from './restaurants/entities/restaurant.entity';
       database: process.env.DB_DB,
       synchronize: process.env.NODE_ENV !== 'prod',
       logging: true,
-      entities: [Restaurant],
+      entities: [User],
+      // Restaurant
     }),
     // graphql
     GraphQLModule.forRoot({
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
-    // by me
-    RestaurantsModule,
+    JwtModule.forRoot({
+      privatekKey: process.env.TOKEN_KEY,
+    }),
+    UsersModule,
+    // RestaurantsModule,
   ],
   controllers: [],
   providers: [],

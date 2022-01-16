@@ -1,4 +1,3 @@
-import { IsBoolean } from 'class-validator';
 import { UpdateRestaurantDto } from './dtos/update-restaurant.dto';
 import { Restaurant } from './entities/restaurant.entity';
 import { Injectable } from '@nestjs/common';
