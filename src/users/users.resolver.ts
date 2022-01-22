@@ -1,3 +1,4 @@
+import { VerifyEmailOutput, VerifyEmailInput } from './dtos/verify-email.dto';
 import { AuthGuard } from './../auth/auth.guard';
 import { LoginOutput, LoginInput } from './dtos/login.dto';
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
@@ -47,13 +48,13 @@ export class UsersResolver {
     }
     return serviceOutput;
   }
-
+  // read token
   @Query((returns) => User)
   @UseGuards(AuthGuard)
   me(@AuthUser() authUser: User) {
     return authUser;
   }
-
+  // read user Profile
   @Query((returns) => UserProfileOutput)
   @UseGuards(AuthGuard)
   async userProfile(
@@ -76,7 +77,7 @@ export class UsersResolver {
     }
     return serviceOutput;
   }
-
+  // edit User
   @Mutation((returns) => EditProfileOutput)
   @UseGuards(AuthGuard)
   async editProfile(
@@ -93,7 +94,7 @@ export class UsersResolver {
     }
     return serviceOutput;
   }
-
+  // delete user
   @Mutation((returns) => DeleteProfileOutput)
   @UseGuards(AuthGuard)
   async deleteUser(
@@ -101,5 +102,12 @@ export class UsersResolver {
     @Args('input') deleteProfileInput: DeleteProfileInput,
   ): Promise<DeleteProfileOutput> {
     return this.usersService.deleteProfile(authUser.id, deleteProfileInput);
+  }
+  // verify email
+  @Mutation((returns) => VerifyEmailOutput)
+  verifyEmail(
+    @Args('input') verifyEmailInput: VerifyEmailInput,
+  ): Promise<VerifyEmailOutput> {
+    return this.usersService.verifyEmail(verifyEmailInput.code);
   }
 }

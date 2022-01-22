@@ -22,7 +22,7 @@ export class User extends Core {
   email: string;
 
   @Field((type) => String)
-  @Column()
+  @Column({ select: false })
   @Length(5, 20)
   password: string;
 
@@ -31,16 +31,21 @@ export class User extends Core {
   @IsEnum(UserRole)
   role: UserRole;
 
+  @Field((type) => Boolean)
+  @Column({ default: false })
+  verified: boolean;
+
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword(): Promise<void> {
-    try {
-      this.password = await bcrypt.hash(this.password, 10);
-    } catch (e) {
-      throw new InternalServerErrorException();
+    if (this.password) {
+      try {
+        this.password = await bcrypt.hash(this.password, 10);
+      } catch (e) {
+        throw new InternalServerErrorException();
+      }
     }
   }
-
   async checkPassword(aPassword: string): Promise<boolean> {
     try {
       return await bcrypt.compare(aPassword, this.password);

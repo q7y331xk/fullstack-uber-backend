@@ -9,6 +9,7 @@ type User {
   email: String!
   password: String!
   role: UserRole!
+  verified: Boolean!
 }
 
 """
@@ -21,6 +22,11 @@ enum UserRole {
   Owner
   Delivery
   Admin
+}
+
+type VerifyEmailOutput {
+  error: String
+  ok: Boolean!
 }
 
 type LoginOutput {
@@ -61,6 +67,7 @@ type Mutation {
   login(input: LoginInput!): LoginOutput!
   editProfile(input: EditProfileInput!): EditProfileOutput!
   deleteUser(input: DeleteProfileInput!): DeleteProfileOutput!
+  verifyEmail(input: VerifyEmailInput!): VerifyEmailOutput!
 }
 
 input CreateAccountInput {
@@ -81,4 +88,8 @@ input EditProfileInput {
 
 input DeleteProfileInput {
   password: String!
+}
+
+input VerifyEmailInput {
+  code: String!
 }

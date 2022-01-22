@@ -15,6 +15,7 @@ import * as Joi from 'joi';
 import { UsersModule } from './users/users.module';
 import { User } from './users/entities/user.entity';
 import { JwtModule } from './jwt/jwt.module';
+import { Verification } from './users/entities/verification.entity';
 
 @Module({
   imports: [
@@ -43,7 +44,7 @@ import { JwtModule } from './jwt/jwt.module';
       database: process.env.DB_DB,
       synchronize: process.env.NODE_ENV !== 'prod',
       logging: true,
-      entities: [User],
+      entities: [User, Verification],
       // Restaurant
     }),
     // graphql
