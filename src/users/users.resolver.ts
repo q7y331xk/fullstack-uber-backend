@@ -11,6 +11,8 @@ import { UseGuards } from '@nestjs/common';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { UserProfileInput, UserProfileOutput } from './dtos/user-profile.dto';
 import { EditProfileOutput, EditProfileInput } from './dtos/edit-profile.dto';
+import { boolean } from 'joi';
+import { DeleteProfileInput, DeleteProfileOutput } from './dtos/delete.dto';
 
 @Resolver((of) => User)
 export class UsersResolver {
@@ -90,5 +92,14 @@ export class UsersResolver {
       serviceOutput.error = error;
     }
     return serviceOutput;
+  }
+
+  @Mutation((returns) => DeleteProfileOutput)
+  @UseGuards(AuthGuard)
+  async deleteUser(
+    @AuthUser() authUser: User,
+    @Args('input') deleteProfileInput: DeleteProfileInput,
+  ): Promise<DeleteProfileOutput> {
+    return this.usersService.deleteProfile(authUser.id, deleteProfileInput);
   }
 }

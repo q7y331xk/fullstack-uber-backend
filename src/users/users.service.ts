@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import * as jwt from 'jsonwebtoken';
 import { User } from './entities/user.entity';
 import { ConfigService } from '@nestjs/config';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -77,5 +78,25 @@ export class UsersService {
       user.password = password;
     }
     return this.users.save(user);
+  }
+
+  async deleteProfile(id, deleteProfileInput) {
+    let ret = { ok: false, error: 'deleteProfile not done' };
+    const user = await this.users.findOne(id);
+    try {
+      const passwordMatch = await bcrypt.compare(
+        deleteProfileInput.password,
+        user.password,
+      );
+      if (passwordMatch) {
+        this.users.delete(id);
+        ret = { ok: true, error: null };
+      } else {
+        ret = { ok: false, error: 'PW not match' };
+      }
+    } catch (error) {
+      ret.error = error;
+    }
+    return ret;
   }
 }
