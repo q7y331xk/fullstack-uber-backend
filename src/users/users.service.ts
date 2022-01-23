@@ -1,3 +1,4 @@
+import { MailService } from './../mail/mail.service';
 import { Verification } from './entities/verification.entity';
 import { EditProfileInput } from './dtos/edit-profile.dto';
 import { JwtService } from './../jwt/jwt.service';
@@ -18,7 +19,8 @@ export class UsersService {
     @InjectRepository(User) private readonly users: Repository<User>,
     @InjectRepository(Verification)
     private readonly verifications: Repository<Verification>,
-    private readonly JwtService: JwtService,
+    private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
   ) {}
 
   async createAccount({
@@ -36,7 +38,10 @@ export class UsersService {
       const user = await this.users.save(
         this.users.create({ email, password, role }),
       );
-      await this.verifications.save(this.verifications.create({ user }));
+      const verification = await this.verifications.save(
+        this.verifications.create({ user }),
+      );
+      this.mailService.sendVeficitationEmail(user.email, verification.code);
       return { ok: true, error: 'no error' };
     } catch (e) {
       return { ok: false, error: "Couldn't create account" };
@@ -60,7 +65,7 @@ export class UsersService {
         if (!passwordCorrect) {
           serviceOutput.error = 'Wrong PW';
         } else {
-          const token = this.JwtService.sign({ id: user.id });
+          const token = this.jwtService.sign({ id: user.id });
           // const token = jwt.sign({ id: user.id }, this.config.get('TOKEN_KEY'));
           serviceOutput = { ok: true, error: 'no error', token };
         }
@@ -83,7 +88,10 @@ export class UsersService {
     if (email) {
       user.email = email;
       user.verified = false;
-      await this.verifications.save(this.verifications.create({ user }));
+      const verification = await this.verifications.save(
+        this.verifications.create({ user }),
+      );
+      this.mailService.sendVeficitationEmail(user.email, verification.code);
     }
     if (password) {
       user.password = password;
@@ -118,7 +126,8 @@ export class UsersService {
     );
     if (verification) {
       verification.user.verified = true;
-      this.users.save(verification.user);
+      await this.users.save(verification.user);
+      await this.verifications.delete(verification.id);
     }
     return { ok: true, error: null };
   }

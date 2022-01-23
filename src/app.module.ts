@@ -16,6 +16,7 @@ import { UsersModule } from './users/users.module';
 import { User } from './users/entities/user.entity';
 import { JwtModule } from './jwt/jwt.module';
 import { Verification } from './users/entities/verification.entity';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -32,6 +33,9 @@ import { Verification } from './users/entities/verification.entity';
         DB_PW: Joi.string().required(),
         DB_DB: Joi.string().required(),
         TOKEN_KEY: Joi.string().required(),
+        MAILGUN_APIKEY: Joi.string().required(),
+        MAILGUN_DOMAIN: Joi.string().required(),
+        MAILGUN_FROMEMAIL: Joi.string().required(),
       }),
     }),
     // typeorm postgres
@@ -56,6 +60,12 @@ import { Verification } from './users/entities/verification.entity';
       privatekKey: process.env.TOKEN_KEY,
     }),
     UsersModule,
+    MailModule.forRoot({
+      // global
+      apiKey: process.env.MAILGUN_APIKEY,
+      domain: process.env.MAILGUN_DOMAIN,
+      fromEmail: process.env.MAILGUN_FROMEMAIL,
+    }),
     // RestaurantsModule,
   ],
   controllers: [],
